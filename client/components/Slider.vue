@@ -1,11 +1,8 @@
 <template>
   <div class="slider-wrapper">
     <div class="slider">
-      {{slideNumber}}
+      <div v-html="slideContents"></div>
     </div>
-    <button @click="prevSlide()">Previous Page</button>
-    <button @click="nextSlide()">Next Page</button>
-    <div v-html="slideContents"></div>
   </div>
 </template>
 
@@ -20,14 +17,6 @@ export default {
     },
     slideContents() {
       return this.$store.state.slideContents
-    }
-  },
-  methods: {
-    prevSlide() {
-      this.$store.dispatch('prevSlide')
-    },
-    nextSlide() {
-      this.$store.dispatch('nextSlide')
     }
   }
 }
