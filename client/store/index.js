@@ -1,16 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import presenter from '../api/presenter'
 
 Vue.use(Vuex);
 
 const state = {
-  count: 0,
-  pageNumber: 0,
-
-  slides: [
-    'http://localhost:8081/presentation1/1.html',
-    'http://localhost:8081/presentation1/2.html'
-  ]
+  slideNumber: 0,
+  slideContents: '',
+  slidesUrls: [],
+  // TODO: render error
+  errorMessage : null
 };
 
 const mutations = {
@@ -20,27 +19,55 @@ const mutations = {
   DECREMENT (state) {
     state.count--
   },
-  PREV_PAGE (state) {
-    if (state.pageNumber > 0) {
-      state.pageNumber--;
+  PREV_SLIDE (state) {
+    if (state.slideNumber > 0) {
+      state.slideNumber--;
     }
   },
-  NEXT_PAGE (state) {
-    // TODO: track max value
-    if (state.pageNumber + 1 < state.slides.length) {
-      state.pageNumber++;
+  NEXT_SLIDE (state) {
+    if (state.slideNumber + 1 < state.slidesUrls.length) {
+      state.slideNumber++;
     }
   },
-  SET_PAGE (state, pageNumber) {
-    state.pageNumber = pageNumber;
+
+  SET_SLIDE_CONTENTS (state, html) {
+    state.slideContents = html
+  },
+
+  SET_SLIDE_URLS (state, slideUrls) {
+    state.slidesUrls = slideUrls
+  },
+  SET_ERROR (state, message) {
+    state.errorMessage = message
   }
 };
 
 const actions = {
-  incrementAsync ({ commit }) {
-    setTimeout(() => {
-      commit('INCREMENT')
-    }, 200)
+  nextSlide ({ commit, dispatch }) {
+    commit('NEXT_SLIDE');
+    dispatch('requestSlide')
+  },
+  prevSlide ({ commit, dispatch }) {
+    commit('PREV_SLIDE');
+    dispatch('requestSlide')
+  },
+  requestSlide ({ commit, state }) {
+    presenter.getSlideContents(
+      state.slidesUrls[state.slideNumber],
+      (resp) => commit('SET_SLIDE_CONTENTS', resp.body),
+      (resp) => commit('SET_ERROR', resp.body)
+    )
+  },
+  init ({ commit, dispatch }) {
+    // TODO: here need an id
+    presenter.getSlidesList(
+      123,
+      function(urls) {
+        commit('SET_SLIDE_URLS', urls);
+        dispatch('requestSlide');
+      },
+      (message) => commit('SET_ERROR', message)
+    )
   }
 };
 

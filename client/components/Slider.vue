@@ -1,36 +1,33 @@
 <template>
   <div class="slider-wrapper">
     <div class="slider">
-      {{pageNumber}}
+      {{slideNumber}}
     </div>
-    <button @click="$store.commit('PREV_PAGE')">Previous Page</button>
-    <button @click="$store.commit('NEXT_PAGE')">Next Page</button>
-    <div>
-      {{slide}}
-    </div>
+    <button @click="prevSlide()">Previous Page</button>
+    <button @click="nextSlide()">Next Page</button>
+    <div v-html="slideContents"></div>
   </div>
 </template>
 
 <script>
+  // TODO: check mappers
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   computed: {
-    pageNumber() {
-      return this.$store.state.pageNumber
+    slideNumber() {
+      return this.$store.state.slideNumber
     },
-    slide() {
-      return this.$store.state.slides[this.pageNumber]
+    slideContents() {
+      return this.$store.state.slideContents
     }
   },
   methods: {
-    getContents(url) {
-      $.ajax({
-        type:     "GET",
-        url:      "https://http://freetexthost.com/r56ct5aw03", // <-- Here
-        dataType: "jsonp",
-        success: function(data){
-          console.log(data);
-        }
-      });
+    prevSlide() {
+      this.$store.dispatch('prevSlide')
+    },
+    nextSlide() {
+      this.$store.dispatch('nextSlide')
     }
   }
 }
